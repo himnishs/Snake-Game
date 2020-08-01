@@ -1,10 +1,6 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-#include <random>
-#include <iostream>
-using std::cout;
-
 const int width = 20;
 const int height = 20;
 class Snake
@@ -14,6 +10,7 @@ class Snake
         void Draw();
         void Input();
         void Logic();
+        bool getOver();
 
     private:
         int x;
@@ -23,5 +20,6 @@ class Snake
         int score;
         enum eDirection {STOP = 0, LEFT, RIGHT, UP, DOWN};
         eDirection direction_snake;
+        bool gameOver = false;
 };
 #endif
