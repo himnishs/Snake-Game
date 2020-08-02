@@ -5,12 +5,18 @@
 using namespace std;
 void Snake::Setup(bool &gameOver)
 {
+    initscr();
+    clear();
+    noecho();
+    cbreak();
+    curs_set(0);
+
     gameOver = false;
     direction_snake = STOP;
     x = width / 2;
     y = height / 2;
-    fruitX = rand() % width;
-    fruitY = rand() % height;
+    fruitX = (rand() % width) + 1;
+    fruitY = (rand() % height) + 1;
 
 }
 void Snake::Draw()
@@ -18,96 +24,93 @@ void Snake::Draw()
     /*
     Things to do:
     - Attempt to add a custom map
+    - Make more maps (small maps, big maps, etc)
     */
 
-    system("clear"); // use system("cls") if using windows
+    clear();
     for(int i = 0; i < width + 1; i++)
     {
-        std::cout<< "-";
+        mvprintw(0,i,"-");
     }
-    std::cout<<'\n';
 
-
-    for(int i = 0; i < height; i++)
+    for(int i = 0; i < height + 2; i++)
     {
-        for(int j = 0; j < width; j++)
+        for(int j = 0; j < width + 2; j++)
         {
-            if(j == 0 )
+            if(j == 0 || i == 21 )
             {
-                std::cout<< "|";
+                mvprintw(i+1,j,"|");
             }
 
             if(i == y && j == x)
             {
-                std::cout<<"O";
+                mvprintw(i,j,"O");
             }
+            // Needs to be more randomized
             else if(i == fruitY && j == fruitX)
             {
-                std::cout<<"F";
+                mvprintw(i,j,"F");
             }
             else
             {
-                std::cout<<" ";
+                mvprintw(i,j,"");
             }
 
             if(j == width - 1)
             {
-                std::cout<<"|";
+                mvprintw(i+1,j+1,"|");
             }
         }
-        std::cout<<'\n';
     }
-    for(int i = 0; i < width + 1; i++)
+
+    for(int i = 0; i < width; i++)
     {
-        std::cout<< "-";
+        mvprintw(22,i,"-");
     }
-    std::cout<<'\n';
+    mvprintw(23,0,"Score %d", score);
     refresh();
 }
+/*
+int kbhit()
+{
+    int ch = getch();
+    if (ch != ERR) {
+        ungetch(ch);
+        return 1;
+    } else {
+        return 2;
+    }
+}
+*/
 void Snake::Input()
 {
-int ch;
-initscr();
-cbreak();
-noecho();
-scrollok(stdscr, TRUE);
-nodelay(stdscr, TRUE);
+    /*
+        TODO:
+        Have a feature for the user to change the speed of snake.
 
-for (;;)
-{
-    if ((ch = getch()) == ERR)
-    {
-        gameOver = true;
-    }
-    else
-    {
-        switch(ch)
-        { 
+    */
+    keypad(stdscr, TRUE); // Ignores 
+    halfdelay(2); // can use to adjust speed of snake
+    int c = getch();
+    switch (c)
+        {
+            case 'w':
+                direction_snake = UP;
+                break;
             case 'a':
-                ungetch(ch);
                 direction_snake = LEFT;
                 break;
-            case 'd':
-                ungetch(ch);
-                direction_snake = RIGHT;
-                break;
-            case 'w':
-                ungetch(ch);
-                direction_snake = UP;
-                break;
             case 's':
-                ungetch(ch);
                 direction_snake = DOWN;
                 break;
-            case 'q':
-                ungetch(ch);
-                direction_snake = UP;
+            case 'd':
+                direction_snake = RIGHT;
+                break;
+            case 'x':
                 gameOver = true;
                 break;
         }
-    }
 }    
-}
 
 void Snake::Logic()
 {
@@ -128,6 +131,21 @@ void Snake::Logic()
         default:
             break;
     }
+
+    //Checks if the snake is out of bounds
+    if(x >= width || x <= 0 || y >= height || y <= 0)
+    {
+        gameOver = true;
+    }
+
+    //Checks if the snake ate the fruit
+    if(x == fruitX && y == fruitY)
+    {
+        score++;
+        fruitX = rand() % width;
+        fruitY = rand() % height;
+    }
+
 }
 
 bool Snake::getOver()
