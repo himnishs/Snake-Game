@@ -5,6 +5,7 @@
 using namespace std;
 void Snake::Setup(bool &gameOver)
 {
+    //Ncurses setup
     initscr();
     clear();
     noecho();
@@ -53,7 +54,20 @@ void Snake::Draw()
             }
             else
             {
-                mvprintw(i,j,"");
+                for(int k = 0; k < nTail; k++)
+                {
+                    if(tailX[k] == j && tailY[k] == i)
+                    {
+                        mvprintw(i,j,"o");
+                    }
+                }
+                /*
+                if(!print)
+                {
+                    mvprintw(i,j,"");
+                }
+                */
+                
             }
 
             if(j == width - 1)
@@ -89,21 +103,25 @@ void Snake::Input()
         Have a feature for the user to change the speed of snake.
 
     */
-    keypad(stdscr, TRUE); // Ignores 
-    halfdelay(2); // can use to adjust speed of snake
+    keypad(stdscr, TRUE);
+    //halfdelay(2); // can use to adjust speed of snake
     int c = getch();
     switch (c)
         {
             case 'w':
+            case KEY_UP:
                 direction_snake = UP;
                 break;
             case 'a':
+            case KEY_LEFT:
                 direction_snake = LEFT;
                 break;
             case 's':
+            case KEY_DOWN:
                 direction_snake = DOWN;
                 break;
             case 'd':
+            case KEY_RIGHT:
                 direction_snake = RIGHT;
                 break;
             case 'x':
@@ -114,6 +132,21 @@ void Snake::Input()
 
 void Snake::Logic()
 {
+    int prevX = tailX[0];
+    int prevY = tailY[0];
+    int prev2X;
+    int prev2Y;
+    tailX[0] = x;
+    tailY[0] = y;
+    for(int i = 1; i < nTail; i++)
+    {
+        prev2X = tailX[i];
+        prev2Y = tailY[i];
+        tailX[i] = prevX;
+        tailY[i] = prevY;
+        prevX = prev2X;
+        prevY = prev2Y;
+    }
     switch(direction_snake)
     {
         case LEFT:
@@ -144,8 +177,16 @@ void Snake::Logic()
         score++;
         fruitX = rand() % width;
         fruitY = rand() % height;
+        nTail++;
     }
 
+    for(int i = 0; i < nTail; i++)
+    {
+        if(tailX[i] == x && tailY[i] == y)
+        {
+            gameOver = true;
+        }
+    }
 }
 
 bool Snake::getOver()
