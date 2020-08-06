@@ -61,13 +61,6 @@ void Snake::Draw()
                         mvprintw(i,j,"o");
                     }
                 }
-                /*
-                if(!print)
-                {
-                    mvprintw(i,j,"");
-                }
-                */
-                
             }
 
             if(j == width - 1)
@@ -84,18 +77,7 @@ void Snake::Draw()
     mvprintw(23,0,"Score %d", score);
     refresh();
 }
-/*
-int kbhit()
-{
-    int ch = getch();
-    if (ch != ERR) {
-        ungetch(ch);
-        return 1;
-    } else {
-        return 2;
-    }
-}
-*/
+
 void Snake::Input()
 {
     /*
@@ -104,7 +86,7 @@ void Snake::Input()
 
     */
     keypad(stdscr, TRUE);
-    //halfdelay(2); // can use to adjust speed of snake
+    halfdelay(2);
     int c = getch();
     switch (c)
         {
@@ -130,7 +112,7 @@ void Snake::Input()
         }
 }    
 
-void Snake::Logic()
+void Snake::Logic(int speed)
 {
     int prevX = tailX[0];
     int prevY = tailY[0];
@@ -149,16 +131,23 @@ void Snake::Logic()
     }
     switch(direction_snake)
     {
+        /*
+            Controls the speed of the snake game
+        */
         case LEFT:
-            x--;
+            changeLeft(x,speed);
+            //x--;
             break;
         case RIGHT:
+            //x = changeRight(x,speed);
             x++;
             break;
         case UP:
+            //y = changeUp(y, speed);
             y--;
             break;
         case DOWN:
+            //y = changeDown(y, speed);
             y++;
             break;
         default:
@@ -192,4 +181,79 @@ void Snake::Logic()
 bool Snake::getOver()
 {
     return gameOver;
+}
+
+void Snake::changeLeft(int &value, int speed)
+{
+    switch(speed)
+    {
+        case 1:
+            value--;
+            break;
+        case 2:
+            value -= 2;
+            break;
+        case 3:
+            value -= 3;
+            break;
+            value--;
+            break;
+    }
+}
+
+void Snake::changeRight(int &value, int speed)
+{
+    switch(speed)
+    {
+        case 1:
+            value++;
+            break;
+        case 2:
+            value += 2;
+            break;
+        case 3:
+            value += 3;
+            break;
+        default:
+            value++;
+            break;
+    }
+}
+
+void Snake::changeDown(int &value, int speed)
+{
+    switch(speed)
+    {
+        case 1:
+            value++;
+            break;
+        case 2:
+            value += 2;
+            break;
+        case 3:
+            value += 3;
+            break;
+        default:
+            value++;
+            break;
+    }
+}
+
+void Snake::changeUp(int &value, int speed)
+{
+    switch(speed)
+    {
+        case 1:
+            value--;
+            break;
+        case 2:
+            value -= 2;
+            break;
+        case 3:
+            value -= 3;
+            break;
+        default:
+            value--;
+            break;
+    }
 }
