@@ -1,5 +1,6 @@
 #include "snake.h"
 #include "ncurses.h"
+#include <unistd.h>
 int main()
 {
     Snake snake;
@@ -12,8 +13,7 @@ int main()
         refresh();
         snake.Draw();
         snake.Input();
-        snake.Logic();
-        // Sleep function
+        snake.Logic(3);
     }
 
     
