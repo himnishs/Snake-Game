@@ -2,7 +2,16 @@
 #include <random>
 #include <iostream>
 #include "ncurses.h"
+#include "unistd.h"
 using namespace std;
+void Snake::CustomSetup(int &speed)
+{
+    std::cout<<"Welcome to the Snake Game! "<<'\n';
+    std::cout<<"How fast do you want the game to be? (1-- Slow, 2-- Medium, 3-- Fast)"<<'\n';
+    std::cin>>speed;
+    return;
+}
+
 void Snake::Setup(bool &gameOver)
 {
     //Ncurses setup
@@ -11,14 +20,14 @@ void Snake::Setup(bool &gameOver)
     noecho();
     cbreak();
     curs_set(0);
-
+    
     gameOver = false;
     direction_snake = STOP;
     x = width / 2;
     y = height / 2;
     fruitX = (rand() % width) + 1;
     fruitY = (rand() % height) + 1;
-
+    score = 0;
 }
 void Snake::Draw()
 {
@@ -29,98 +38,99 @@ void Snake::Draw()
     */
 
     clear();
-    for(int i = 0; i < width + 1; i++)
+    for(int i = 0; i < width+2; i++)
     {
         mvprintw(0,i,"-");
     }
-
-    for(int i = 0; i < height + 2; i++)
+    for(int i = 0; i < height+2; i++)
     {
-        for(int j = 0; j < width + 2; j++)
+        for(int j = 0; j < width+2; j++)
         {
-            if(j == 0 || i == 21 )
-            {
-                mvprintw(i+1,j,"|");
-            }
 
-            if(i == y && j == x)
+            if (i == 0 || i == 41)
             {
-                mvprintw(i,j,"O");
+                mvprintw(i, j, "-");
             }
-            // Needs to be more randomized
+            else if (j == 0 || j == 41)
+            {
+                mvprintw(i, j, "-");
+            }
+            else if (i == y && j == x)
+            {
+                mvprintw(i, j, "O");
+            }
             else if(i == fruitY && j == fruitX)
             {
-                mvprintw(i,j,"F");
+                mvprintw(i, j, "Q");
             }
             else
             {
-                for(int k = 0; k < nTail; k++)
+              for(int k = 0; k < nTail; k++)
+              {
+                if (tailX[k] == j && tailY[k] == i)
                 {
-                    if(tailX[k] == j && tailY[k] == i)
-                    {
-                        mvprintw(i,j,"o");
-                    }
+                    mvprintw(i, j, "o");
                 }
-            }
-
-            if(j == width - 1)
-            {
-                mvprintw(i+1,j+1,"|");
-            }
+              }
+            }      
         }
     }
-
-    for(int i = 0; i < width; i++)
-    {
-        mvprintw(22,i,"-");
-    }
-    mvprintw(23,0,"Score %d", score);
+    mvprintw(43, 0, "Score %d", score);
     refresh();
 }
 
-void Snake::Input()
+void Snake::Input(int speed)
 {
-    /*
-        TODO:
-        Have a feature for the user to change the speed of snake.
-
-    */
     keypad(stdscr, TRUE);
-    halfdelay(2);
+    switch(speed)
+    {
+        case 1:
+            halfdelay(3);
+            break;
+        case 2:
+            halfdelay(2);
+            break;
+        case 3:
+            halfdelay(1);
+            break;
+        default:
+            halfdelay(2);
+            break;
+    }
     int c = getch();
     switch (c)
-        {
-            case 'w':
-            case KEY_UP:
-                direction_snake = UP;
-                break;
-            case 'a':
-            case KEY_LEFT:
-                direction_snake = LEFT;
-                break;
-            case 's':
-            case KEY_DOWN:
-                direction_snake = DOWN;
-                break;
-            case 'd':
-            case KEY_RIGHT:
-                direction_snake = RIGHT;
-                break;
-            case 'x':
-                gameOver = true;
-                break;
-        }
+    {
+        case 'w':
+        case KEY_UP:
+            direction_snake = UP;
+            break;
+        case 'a':
+        case KEY_LEFT:
+            direction_snake = LEFT;
+            break;
+        case 's':
+        case KEY_DOWN:
+            direction_snake = DOWN;
+            break;
+        case 'd':
+        case KEY_RIGHT:
+            direction_snake = RIGHT;
+            break;
+        case 'x':
+            gameOver = true;
+            break;
+    }
 }    
 
-void Snake::Logic(int speed)
+void Snake::Logic()
 {
     int prevX = tailX[0];
     int prevY = tailY[0];
-    int prev2X;
-    int prev2Y;
+    int prev2X, prev2Y;
     tailX[0] = x;
     tailY[0] = y;
-    for(int i = 1; i < nTail; i++)
+    
+    for (int i = 1; i < nTail; i++)
     {
         prev2X = tailX[i];
         prev2Y = tailY[i];
@@ -129,49 +139,41 @@ void Snake::Logic(int speed)
         prevX = prev2X;
         prevY = prev2Y;
     }
+    
     switch(direction_snake)
     {
-        /*
-            Controls the speed of the snake game
-        */
         case LEFT:
-            changeLeft(x,speed);
-            //x--;
+            x--;
             break;
         case RIGHT:
-            //x = changeRight(x,speed);
             x++;
             break;
         case UP:
-            //y = changeUp(y, speed);
             y--;
             break;
         case DOWN:
-            //y = changeDown(y, speed);
             y++;
             break;
         default:
             break;
     }
 
-    //Checks if the snake is out of bounds
-    if(x >= width || x <= 0 || y >= height || y <= 0)
+    if(x > width || x < 1 || y < 1 || y > height)
     {
         gameOver = true;
     }
 
-    //Checks if the snake ate the fruit
     if(x == fruitX && y == fruitY)
     {
         score++;
-        fruitX = rand() % width;
-        fruitY = rand() % height;
+        fruitX = (rand() % width)+1;
+        fruitY = (rand() % height)+1;
         nTail++;
     }
 
-    for(int i = 0; i < nTail; i++)
+    for (int i = 0; i < nTail; i++)
     {
-        if(tailX[i] == x && tailY[i] == y)
+        if (tailX[i] == x && tailY[i] == y)
         {
             gameOver = true;
         }
@@ -181,79 +183,4 @@ void Snake::Logic(int speed)
 bool Snake::getOver()
 {
     return gameOver;
-}
-
-void Snake::changeLeft(int &value, int speed)
-{
-    switch(speed)
-    {
-        case 1:
-            value--;
-            break;
-        case 2:
-            value -= 2;
-            break;
-        case 3:
-            value -= 3;
-            break;
-            value--;
-            break;
-    }
-}
-
-void Snake::changeRight(int &value, int speed)
-{
-    switch(speed)
-    {
-        case 1:
-            value++;
-            break;
-        case 2:
-            value += 2;
-            break;
-        case 3:
-            value += 3;
-            break;
-        default:
-            value++;
-            break;
-    }
-}
-
-void Snake::changeDown(int &value, int speed)
-{
-    switch(speed)
-    {
-        case 1:
-            value++;
-            break;
-        case 2:
-            value += 2;
-            break;
-        case 3:
-            value += 3;
-            break;
-        default:
-            value++;
-            break;
-    }
-}
-
-void Snake::changeUp(int &value, int speed)
-{
-    switch(speed)
-    {
-        case 1:
-            value--;
-            break;
-        case 2:
-            value -= 2;
-            break;
-        case 3:
-            value -= 3;
-            break;
-        default:
-            value--;
-            break;
-    }
 }
