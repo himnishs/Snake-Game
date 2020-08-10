@@ -1,5 +1,5 @@
 all: run
 run: main.cpp snake.cpp 
-	g++ snake.cpp main.cpp -o something -lncurses
+	g++ snake.cpp main.cpp -o snake_game -lncurses
 clean:
-	rm something
+	rm snake_game
