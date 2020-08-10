@@ -2,13 +2,36 @@
 #include <random>
 #include <iostream>
 #include "ncurses.h"
-#include "unistd.h"
 using namespace std;
-void Snake::CustomSetup(int &speed)
+
+static int height;
+static int width;
+void Snake::CustomSetup(int &speed, int &map_size)
 {
     std::cout<<"Welcome to the Snake Game! "<<'\n';
     std::cout<<"How fast do you want the game to be? (1-- Slow, 2-- Medium, 3-- Fast)"<<'\n';
     std::cin>>speed;
+    std::cout<<"How big would you like the map to be? (1-- Small, 2-- Medium, 3-- Large)"<<'\n';
+    std::cin>>map_size;
+
+    switch(map_size)
+    {
+        case 1:
+            height = rand() % 20 + 10;
+            width = height;
+            break;
+        case 2:
+            height = rand() % 30 + 20;
+            width = height;
+            break;
+        case 3:
+            height = rand() % 40 + 30;
+            width = height;
+            break;
+        default:
+            height = 20;
+            width = 20;
+    }
     return;
 }
 
@@ -29,14 +52,9 @@ void Snake::Setup(bool &gameOver)
     fruitY = (rand() % height) + 1;
     score = 0;
 }
+
 void Snake::Draw()
 {
-    /*
-    Things to do:
-    - Attempt to add a custom map
-    - Make more maps (small maps, big maps, etc)
-    */
-
     clear();
     for(int i = 0; i < width+2; i++)
     {
@@ -47,11 +65,11 @@ void Snake::Draw()
         for(int j = 0; j < width+2; j++)
         {
 
-            if (i == 0 || i == 41)
+            if (i == 0 || i == width+1)
             {
                 mvprintw(i, j, "-");
             }
-            else if (j == 0 || j == 41)
+            else if (j == 0 || j == width+1)
             {
                 mvprintw(i, j, "-");
             }
@@ -61,7 +79,7 @@ void Snake::Draw()
             }
             else if(i == fruitY && j == fruitX)
             {
-                mvprintw(i, j, "Q");
+                mvprintw(i, j, "F");
             }
             else
             {
@@ -75,7 +93,7 @@ void Snake::Draw()
             }      
         }
     }
-    mvprintw(43, 0, "Score %d", score);
+    mvprintw(width+3, 0, "Score %d", score);
     refresh();
 }
 

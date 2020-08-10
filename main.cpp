@@ -1,20 +1,13 @@
- 
 #include "snake.h"
 #include "ncurses.h"
 int main()
 {
-    /*
-    Goals for Today:
-    - Add a second player
-    - Connect to AWS
-    - Custom Speed(Done)
-
-    */
     Snake snake;
     bool gameOver_1 = snake.getOver();
     int input;
     int speed = 3;
-    snake.CustomSetup(speed);
+    int map_size = 0;
+    snake.CustomSetup(speed, map_size);
     snake.Setup(gameOver_1);
     snake.Draw();
 
