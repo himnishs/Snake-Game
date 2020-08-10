@@ -8,6 +8,7 @@ static int height;
 static int width;
 void Snake::CustomSetup(int &speed, int &map_size)
 {
+    //Asks user for the speed of the delay, and the map size
     std::cout<<"Welcome to the Snake Game! "<<'\n';
     std::cout<<"How fast do you want the game to be? (1-- Slow, 2-- Medium, 3-- Fast)"<<'\n';
     std::cin>>speed;
@@ -38,12 +39,13 @@ void Snake::CustomSetup(int &speed, int &map_size)
 void Snake::Setup(bool &gameOver)
 {
     //Ncurses setup
-    initscr();
-    clear();
-    noecho();
-    cbreak();
-    curs_set(0);
+    initscr(); // Initializes Screen
+    clear(); // Clears Screen
+    noecho();// Doesn't print wasd to screen
+    cbreak(); // Disables line-buffering
+    curs_set(0); // Sets Cursor to Invisible
     
+    //Variable Initialization
     gameOver = false;
     direction_snake = STOP;
     x = width / 2;
@@ -55,7 +57,9 @@ void Snake::Setup(bool &gameOver)
 
 void Snake::Draw()
 {
-    clear();
+    //Draws the board + the snake + the food
+    clear(); // clears the screen (curses)
+    //mvprintw == move + printw (curses)
     for(int i = 0; i < width+2; i++)
     {
         mvprintw(0,i,"-");
@@ -99,6 +103,7 @@ void Snake::Draw()
 
 void Snake::Input(int speed)
 {
+    //Changing the speed of the snake
     keypad(stdscr, TRUE);
     switch(speed)
     {
@@ -115,6 +120,7 @@ void Snake::Input(int speed)
             halfdelay(2);
             break;
     }
+    //getting the key the user presses
     int c = getch();
     switch (c)
     {
@@ -142,6 +148,7 @@ void Snake::Input(int speed)
 
 void Snake::Logic()
 {
+    //Logic to increase the snake's tail
     int prevX = tailX[0];
     int prevY = tailY[0];
     int prev2X, prev2Y;
@@ -157,7 +164,7 @@ void Snake::Logic()
         prevX = prev2X;
         prevY = prev2Y;
     }
-    
+    // Logic to change the direction of the snake
     switch(direction_snake)
     {
         case LEFT:
@@ -175,12 +182,12 @@ void Snake::Logic()
         default:
             break;
     }
-
+    //checks to see if the snake hit the borders
     if(x > width || x < 1 || y < 1 || y > height)
     {
         gameOver = true;
     }
-
+    //Checks if the snake ate the fruit
     if(x == fruitX && y == fruitY)
     {
         score++;
@@ -188,7 +195,7 @@ void Snake::Logic()
         fruitY = (rand() % height)+1;
         nTail++;
     }
-
+    // Checks if the snake hit its own tail
     for (int i = 0; i < nTail; i++)
     {
         if (tailX[i] == x && tailY[i] == y)
@@ -197,7 +204,7 @@ void Snake::Logic()
         }
     }
 }
-
+// Gets the gameOver variable
 bool Snake::getOver()
 {
     return gameOver;
