@@ -1,13 +1,10 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 #include <vector>
-const int width = 40;
-const int height = 40;
-
 class Snake
 {
     public:
-        void CustomSetup(int &speed);
+        void CustomSetup(int &speed, int &map_size);
         void Setup(bool &gameOver);
         void Draw();
         void Input(int speed);
