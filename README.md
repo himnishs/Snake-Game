@@ -2,12 +2,12 @@
 
 Snake game made using ncurses!
 
-#Installing Curses
+# Installing Curses
 sudo apt-get install libncurses5-dev libncursesw5-dev
 
-#Running
+# Running
 make run
 
-#Improvements To Do In The Future
+# Improvements To Do In The Future
 - Add two player functionality
 - Ai Snake
